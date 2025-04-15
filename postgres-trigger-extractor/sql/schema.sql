@@ -19,3 +19,4 @@ CREATE TABLE IF NOT EXISTS sample_table (
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
