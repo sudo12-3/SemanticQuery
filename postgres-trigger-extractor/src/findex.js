@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Client } = require('pg');
 const fs = require('fs').promises;
 const connectionString = process.env.DATABASE_URL;
@@ -36,10 +37,10 @@ async function generateRLSPolicies(jsonPath) {
                 -- ALTER TABLE ${rule.table} FORCE ROW LEVEL SECURITY;
                 
                 -- Drop existing policy if exists
-                DROP POLICY IF EXISTS ${rule.table}_select_policy ON ${rule.table};
+                DROP POLICY IF EXISTS ${rule.table}_select_policy_${rule.attribute} ON ${rule.table};
                 
                 -- Create new policy
-                CREATE POLICY ${rule.table}_select_policy
+                CREATE POLICY ${rule.table}_select_policy_${rule.attribute}
                 ON ${rule.table}
                 FOR SELECT
                 TO PUBLIC
