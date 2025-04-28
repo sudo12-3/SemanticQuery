@@ -1,0 +1,27 @@
+{
+  "generated_at": "2025-04-24T16:51:27.456Z",
+  "insert": [
+    {
+      "table": "users",
+      "attribute": "id",
+      "rule": "id > 4"
+    },
+    {
+      "table": "sample_table",
+      "attribute": "id",
+      "rule": "id > 5"
+    }
+  ],
+  "update": [
+    {
+      "table": "users",
+      "attribute": "id",
+      "rule": "id > 4"
+    },
+    {
+      "table": "sample_table",
+      "attribute": "id",
+      "rule": "id > 5"
+    }
+  ]
+}

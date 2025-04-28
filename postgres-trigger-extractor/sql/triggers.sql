@@ -34,6 +34,80 @@ CREATE TABLE IF NOT EXISTS trigger_log (
     changed_at TIMESTAMP NOT NULL
 );
 
+-- Trigger function
+CREATE OR REPLACE FUNCTION insert_if_id_gt_4()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id <= 4 THEN
+        -- Skip the insert by returning NULL
+        RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger function for BEFORE UPDATE
+CREATE OR REPLACE FUNCTION update_if_id_gt_4()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id <= 4 THEN
+        -- Skip the update by returning NULL
+        RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger function
+CREATE OR REPLACE FUNCTION insert_if_id_gt_5()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id > 5 THEN
+        -- Skip the insert by returning NULL
+        RETURN NEW;
+    ELSE
+        NEW.id := OLD.id;  -- Keep the old id if condition not met
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger function for BEFORE UPDATE
+CREATE OR REPLACE FUNCTION update_if_id_gt_5()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id > 5 THEN
+        -- Skip the insert by returning NULL
+        RETURN NEW;
+    ELSE
+        NEW.id := OLD.id;  -- Keep the old id if condition not met
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_update_users
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_if_id_gt_4();
+
+-- Trigger on users table
+CREATE TRIGGER before_insert_users
+BEFORE INSERT ON users
+FOR EACH ROW
+EXECUTE FUNCTION insert_if_id_gt_4();
+
+CREATE TRIGGER before_update_sample_table
+BEFORE UPDATE ON sample_table
+FOR EACH ROW
+EXECUTE FUNCTION update_if_id_gt_5();
+
+-- Trigger on users table
+CREATE TRIGGER before_insert_sample_table
+BEFORE INSERT ON sample_table
+FOR EACH ROW
+EXECUTE FUNCTION insert_if_id_gt_5();
+
 CREATE TRIGGER after_insert_trigger
 AFTER INSERT ON sample_table
 FOR EACH ROW EXECUTE FUNCTION log_insert();

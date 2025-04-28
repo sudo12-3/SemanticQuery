@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client } = require('pg');
 const { extractTriggers } = require('./extractors/triggerExtractor');
+const fs = require('fs');
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -14,21 +15,25 @@ async function main() {
         console.log('Connected to the database');
 
         const triggers = await extractTriggers(client);
+        console.log(triggers);
+        // Filter only BEFORE INSERT triggers
+        const beforeTriggers = triggers.filter(trigger =>
+            trigger.trigger_definition.toUpperCase().includes('BEFORE INSERT') ||
+            trigger.trigger_definition.toUpperCase().includes('BEFORE UPDATE')
+        );
         
-        // Print each trigger in a formatted way
-        console.log('\n==== PostgreSQL Triggers ====\n');
-        
-        triggers.forEach(trigger => {
-            console.log(`Trigger: ${trigger.trigger_name}`);
-            console.log(`On Table: ${trigger.schema_name}.${trigger.table_name}`);
-            console.log(`\nTrigger Definition:`);
-            console.log(trigger.trigger_definition);
-            console.log(`\nFunction Name: ${trigger.function_name}`);
-            console.log(`\nFunction Definition:`);
-            console.log(trigger.function_definition);
-            console.log('\n' + '='.repeat(50) + '\n');
+
+        console.log('\n==== BEFORE INSERT Trigger Functions ====\n');
+
+        beforeTriggers.forEach(trigger => {
+            // Format the string to write to the file
+            const triggerFunctionData = `
+                Function Name:${trigger.function_name}
+                Function Definition:${trigger.function_definition}
+                ${'='.repeat(50)}`;
+            fs.appendFileSync('output1.txt', triggerFunctionData);
         });
-        
+
     } catch (error) {
         console.error('Error connecting to the database or extracting triggers:', error);
     } finally {
